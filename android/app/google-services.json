@@ -1,0 +1,40 @@
+{
+  "project_info": {
+    "project_number": "805542197370",
+    "firebase_url": "https://smart-electricsocket-default-rtdb.asia-southeast1.firebasedatabase.app",
+    "project_id": "smart-electricsocket",
+    "storage_bucket": "smart-electricsocket.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:805542197370:android:741c6ddbdb4c847c99a3c3",
+        "android_client_info": {
+          "package_name": "com.andiles.smartsocket"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "805542197370-av7gu4uplkjamhm8hc4ptj6hle1s1uai.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCrcOnSxpWhjIh7xV3L__CdUm72hwx7q5g"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "805542197370-av7gu4uplkjamhm8hc4ptj6hle1s1uai.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
