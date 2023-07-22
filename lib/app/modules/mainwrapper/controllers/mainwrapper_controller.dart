@@ -1,7 +1,13 @@
 import 'package:get/get.dart';
+import 'package:smartsocket/app/routes/app_pages.dart';
 
 class MainwrapperController extends GetxController {
-  //TODO: Implement MainwrapperController
+  String currentRoutes = Routes.HOME;
+
+  void updateCurrentRoutes(String route) async {
+    currentRoutes = route;
+    await Future.delayed(Duration.zero).then((value) => update());
+  }
 
   final count = 0.obs;
   @override

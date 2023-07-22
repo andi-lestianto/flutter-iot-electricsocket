@@ -18,7 +18,7 @@ class SocketCardWidget extends StatelessWidget {
       padding: EdgeInsets.all(16.w),
       decoration: BoxDecoration(
           border: socket!.value == true
-              ? null
+              ? Border.all(width: 2, color: ClrTheme.clrDarkGray)
               : Border.all(width: 2, color: ClrTheme.clrWhiteGray),
           color:
               socket!.value == true ? ClrTheme.clrDarkBlue : ClrTheme.clrWhite,
