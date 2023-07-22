@@ -59,7 +59,7 @@ class HomeController extends GetxController {
   @override
   void onInit() {
     super.onInit();
-    // readSocketValue();
+    print('Hooiiii');
     counterSubscription = ref.onValue.listen(
       (DatabaseEvent event) {
         print(event.snapshot.value);

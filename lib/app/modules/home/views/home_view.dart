@@ -68,9 +68,15 @@ class HomeView extends GetView<HomeController> {
                       Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          Text(
-                            'Selamat Pagi',
-                            style: FontTheme.regular.copyWith(fontSize: 12.sp),
+                          GestureDetector(
+                            onTap: () {
+                              print(_.mainSocket);
+                            },
+                            child: Text(
+                              'Selamat Pagi',
+                              style:
+                                  FontTheme.regular.copyWith(fontSize: 12.sp),
+                            ),
                           ),
                           Text(
                             'Selasa, 18 Mei 2023',

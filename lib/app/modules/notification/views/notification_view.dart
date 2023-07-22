@@ -3,6 +3,8 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 
 import 'package:get/get.dart';
+import 'package:lottie/lottie.dart';
+import 'package:smartsocket/app/modules/notification/dialog/configurenotification_dialog.dart';
 import 'package:smartsocket/app/theme/color_theme.dart';
 import 'package:smartsocket/app/theme/font_theme.dart';
 import 'package:smartsocket/app/widget/notificationcard_widget.dart';
@@ -36,12 +38,19 @@ class NotificationView extends GetView<NotificationController> {
                         )
                       ],
                     ),
-                    Padding(
-                      padding: EdgeInsets.symmetric(vertical: 9.w),
-                      child: SvgPicture.asset(
-                        'assets/icon/ic-addsquare.svg',
-                        height: 30.w,
-                        width: 30.w,
+                    InkWell(
+                      highlightColor: Colors.transparent,
+                      splashColor: ClrTheme.clrTransparent,
+                      onTap: () {
+                        ConfigureNotificationDialog().dialogShow();
+                      },
+                      child: Padding(
+                        padding: EdgeInsets.symmetric(vertical: 9.w),
+                        child: SvgPicture.asset(
+                          'assets/icon/ic-addsquare.svg',
+                          height: 30.w,
+                          width: 30.w,
+                        ),
                       ),
                     ),
                   ],
@@ -49,7 +58,41 @@ class NotificationView extends GetView<NotificationController> {
                 SizedBox(
                   height: 24.w,
                 ),
-                ...List.generate(4, (index) => NotificationCardWidget())
+                _.notificationAlarm.isEmpty
+                    ? Expanded(
+                        child: Column(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            Lottie.asset(
+                                'assets/lottie/lottie-emptynotification.json',
+                                width: 200.w,
+                                height: 200.w,
+                                fit: BoxFit.cover),
+                            SizedBox(
+                              height: 24.w,
+                            ),
+                            Text(
+                              'Pengingat Masih Kosong',
+                              style:
+                                  FontTheme.regular.copyWith(fontSize: 12.sp),
+                            ),
+                            SizedBox(
+                              height: 48.w,
+                            ),
+                          ],
+                        ),
+                      )
+                    : Column(
+                        children: [
+                          ...List.generate(
+                              _.notificationAlarm.length,
+                              (index) => NotificationCardWidget(
+                                    onTap: () {
+                                      // _.getAlarm();
+                                    },
+                                  ))
+                        ],
+                      )
               ],
             ),
           ),

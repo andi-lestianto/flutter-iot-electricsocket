@@ -1,13 +1,12 @@
 import 'package:flutter/cupertino.dart';
-import 'package:flutter/src/widgets/container.dart';
-import 'package:flutter/src/widgets/framework.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:smartsocket/app/theme/color_theme.dart';
 import 'package:smartsocket/app/theme/font_theme.dart';
 
 class NotificationCardWidget extends StatelessWidget {
-  const NotificationCardWidget({super.key});
+  final Function onTap;
+  const NotificationCardWidget({super.key, required this.onTap});
 
   @override
   Widget build(BuildContext context) {
@@ -19,15 +18,20 @@ class NotificationCardWidget extends StatelessWidget {
           border: Border.all(width: 2.w, color: ClrTheme.clrWhiteGray)),
       child: Row(
         children: [
-          Container(
-            padding: EdgeInsets.all(8.w),
-            height: 40.w,
-            width: 40.w,
-            decoration:
-                BoxDecoration(shape: BoxShape.circle, color: ClrTheme.clrGold),
-            child: SvgPicture.asset(
-              'assets/icon/nav/ic-notification.svg',
-              color: ClrTheme.clrWhite,
+          GestureDetector(
+            onTap: () {
+              onTap();
+            },
+            child: Container(
+              padding: EdgeInsets.all(8.w),
+              height: 40.w,
+              width: 40.w,
+              decoration: BoxDecoration(
+                  shape: BoxShape.circle, color: ClrTheme.clrGold),
+              child: SvgPicture.asset(
+                'assets/icon/nav/ic-notification.svg',
+                color: ClrTheme.clrWhite,
+              ),
             ),
           ),
           SizedBox(
