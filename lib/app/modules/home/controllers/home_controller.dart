@@ -3,14 +3,22 @@ import 'dart:convert';
 
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_database/firebase_database.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:get/get.dart';
 import 'package:smartsocket/app/data/mainsocket_model.dart';
 import 'package:smartsocket/app/data/notification_model.dart';
 import 'package:smartsocket/app/helper/controlenum_helper.dart';
+import 'package:smartsocket/app/widget/toast_widget.dart';
 
 class HomeController extends GetxController {
   DatabaseReference ref = FirebaseDatabase.instance.ref('data');
   MainSocket? mainSocket;
+
+  final TextEditingController labelController = TextEditingController();
+
+  setTextController({required String text}) {
+    labelController.text = text;
+  }
 
   late StreamSubscription<DatabaseEvent> socketSubscription;
 
@@ -20,12 +28,22 @@ class HomeController extends GetxController {
       bool value = socket.value ?? false;
 
       await ref.update({
-        socketName: {
-          'imgpath': 'assets/icon/ic_lamp.svg',
-          'location': 'Living Room',
-          'value': !value
-        }
+        socketName: {'description': socket.description, 'value': !value}
       });
+    }
+  }
+
+  Future setSocketLabel(
+      {required String socketName, required String labelName}) async {
+    final Socket? socket = await getSpecificSocketValue(socketName: socketName);
+    if (socket != null) {
+      bool value = socket.value ?? false;
+
+      await ref.update({
+        socketName: {'description': labelName, 'value': value}
+      });
+      Get.back();
+      ToastPopup().showSucess(message: 'Label berhasil diganti!');
     }
   }
 
@@ -51,15 +69,14 @@ class HomeController extends GetxController {
     String socketName = ControlEnumHelper()
         .getStringControlSocket(controlSocketEnum: controlSocket);
 
-    bool value = controlType == ControlType.turnoff ? false : true;
+    final Socket? socket = await getSpecificSocketValue(socketName: socketName);
 
-    await ref.update({
-      socketName: {
-        'imgpath': 'assets/icon/ic_lamp.svg',
-        'location': 'Living Room',
-        'value': value
-      }
-    });
+    if (socket != null) {
+      bool value = controlType == ControlType.turnoff ? false : true;
+      await ref.update({
+        socketName: {'description': socket.description, 'value': value}
+      });
+    }
   }
 
   @override

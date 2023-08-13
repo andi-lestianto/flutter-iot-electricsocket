@@ -26,18 +26,18 @@ class ToastPopup {
   showSucess({required String message}) {
     Get.snackbar('Berhasil', message,
         margin: EdgeInsets.all(24.w),
-        backgroundColor: ClrTheme.clrWhite,
+        backgroundColor: ClrTheme.clrTeal,
         messageText: Container(
           child: Text(message,
               style: FontTheme.regular.copyWith(
                 fontSize: 12.sp,
-                color: ClrTheme.clrBlack,
+                color: ClrTheme.clrWhite,
               )),
         ),
         titleText: Text(
           'Berhasil',
           style: FontTheme.bold
-              .copyWith(fontSize: 16.sp, color: ClrTheme.clrBlack),
+              .copyWith(fontSize: 16.sp, color: ClrTheme.clrWhite),
         ));
   }
 }

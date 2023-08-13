@@ -41,22 +41,20 @@ class MainSocket {
 }
 
 class Socket {
-  String? imgpath;
-  String? location;
+  String? description;
   bool? value;
 
-  Socket({this.imgpath, this.location, this.value});
+  Socket({this.description, this.value});
 
   Socket.fromJson(Map<String, dynamic> json) {
-    imgpath = json['imgpath'];
-    location = json['location'];
+    description = json['description'];
     value = json['value'];
   }
 
   Map<String, dynamic> toJson() {
     final Map<String, dynamic> data = new Map<String, dynamic>();
-    data['imgpath'] = this.imgpath;
-    data['location'] = this.location;
+
+    data['description'] = this.description;
     data['value'] = this.value;
     return data;
   }

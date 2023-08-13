@@ -5,9 +5,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 import 'package:get/get.dart';
+import 'package:intl/date_symbol_data_local.dart';
 import 'package:smartsocket/app/data/notification_model.dart';
 import 'package:smartsocket/app/database/db_services.dart';
-import 'package:smartsocket/app/helper/controlenum_helper.dart';
 import 'package:smartsocket/app/modules/home/controllers/home_controller.dart';
 
 import 'app/routes/app_pages.dart';
@@ -15,6 +15,7 @@ import 'app/routes/app_pages.dart';
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp();
+  await initializeDateFormatting('id', null);
   await Alarm.init();
   await Alarm.ringStream.stream.listen((AlarmSettings event) {
     alarmAction(event);

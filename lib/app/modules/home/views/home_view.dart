@@ -3,6 +3,8 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 
 import 'package:get/get.dart';
+import 'package:smartsocket/app/helper/datetime_helper.dart';
+import 'package:smartsocket/app/modules/notification/dialog/configurenotification_dialog.dart';
 import 'package:smartsocket/app/theme/color_theme.dart';
 import 'package:smartsocket/app/theme/font_theme.dart';
 import 'package:smartsocket/app/widget/socketcard_widget.dart';
@@ -73,13 +75,13 @@ class HomeView extends GetView<HomeController> {
                               print(_.mainSocket);
                             },
                             child: Text(
-                              'Selamat Pagi',
+                              DateTimeHelper().getGreeting(),
                               style:
                                   FontTheme.regular.copyWith(fontSize: 12.sp),
                             ),
                           ),
                           Text(
-                            'Selasa, 18 Mei 2023',
+                            DateTimeHelper().getDateNowId(),
                             style: FontTheme.bold.copyWith(fontSize: 12.sp),
                           )
                         ],
@@ -103,11 +105,40 @@ class HomeView extends GetView<HomeController> {
                             onTap: () {
                               _.setSocketValue(socketName: 'socket1');
                             },
+                            onEditTap: () {
+                              _.setTextController(
+                                  text: _.mainSocket!.socket1!.description
+                                      .toString());
+                              configureSocketDesc().dialogShow(context,
+                                  socketId: 'Socket 1',
+                                  socket: _.mainSocket!.socket1!,
+                                  textEditingController: _.labelController,
+                                  onSave: () {
+                                _.setSocketLabel(
+                                    socketName: 'socket1',
+                                    labelName: _.labelController.text);
+                              });
+                            },
                           ),
                           SocketCardWidget(
                             socket: _.mainSocket!.socket2,
                             onTap: () {
                               _.setSocketValue(socketName: 'socket2');
+                            },
+                            onEditTap: () {
+                              _.setTextController(
+                                  text: _.mainSocket!.socket2!.description
+                                      .toString());
+
+                              configureSocketDesc().dialogShow(context,
+                                  socketId: 'Socket 2',
+                                  socket: _.mainSocket!.socket2!,
+                                  textEditingController: _.labelController,
+                                  onSave: () {
+                                _.setSocketLabel(
+                                    socketName: 'socket2',
+                                    labelName: _.labelController.text);
+                              });
                             },
                           ),
                           SocketCardWidget(
@@ -115,11 +146,41 @@ class HomeView extends GetView<HomeController> {
                             onTap: () {
                               _.setSocketValue(socketName: 'socket3');
                             },
+                            onEditTap: () {
+                              _.setTextController(
+                                  text: _.mainSocket!.socket3!.description
+                                      .toString());
+
+                              configureSocketDesc().dialogShow(context,
+                                  socketId: 'Socket 3',
+                                  socket: _.mainSocket!.socket3!,
+                                  textEditingController: _.labelController,
+                                  onSave: () {
+                                _.setSocketLabel(
+                                    socketName: 'socket3',
+                                    labelName: _.labelController.text);
+                              });
+                            },
                           ),
                           SocketCardWidget(
                             socket: _.mainSocket!.socket4,
                             onTap: () {
                               _.setSocketValue(socketName: 'socket4');
+                            },
+                            onEditTap: () {
+                              _.setTextController(
+                                  text: _.mainSocket!.socket4!.description
+                                      .toString());
+
+                              configureSocketDesc().dialogShow(context,
+                                  socketId: 'Socket 4',
+                                  socket: _.mainSocket!.socket4!,
+                                  textEditingController: _.labelController,
+                                  onSave: () {
+                                _.setSocketLabel(
+                                    socketName: 'socket4',
+                                    labelName: _.labelController.text);
+                              });
                             },
                           ),
                         ]),

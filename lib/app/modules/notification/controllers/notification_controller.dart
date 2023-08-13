@@ -68,8 +68,71 @@ class NotificationController extends GetxController {
     setSelectedTime(timeOfDay: TimeOfDay.now());
   }
 
+  fillAlarmForm({required NotificationAlarm data}) {
+    nameController.text = data.alarmSettings!.notificationTitle!;
+    selectedControlSocket = data.controlSocket!;
+    selectedControlType = data.controlType!;
+    setSelectedTime(
+        timeOfDay: TimeOfDay.fromDateTime(data.alarmSettings!.dateTime));
+  }
+
   addNotificationAlarm(
       {required String timeAlarm,
+      required String alarmName,
+      required ControlSocket controlSocket,
+      required ControlType controlType}) async {
+    try {
+      if (alarmName == '') {
+        ToastPopup().showAlert(message: 'Nama pengingat wajib diisi!');
+      } else if (controlSocket != ControlSocket.none &&
+          controlType == ControlType.none) {
+        ToastPopup().showAlert(message: 'Type kontrol tidak boleh \'none\'');
+      } else if ((notificationAlarm.firstWhereOrNull((element) =>
+                  element.alarmSettings!.dateTime ==
+                  DateTime.parse(
+                      '${DateTimeHelper().getDateNow()} ${timeAlarm}')) !=
+              null) ||
+          (notificationAlarm.firstWhereOrNull((element) =>
+                  element.alarmSettings!.dateTime ==
+                  DateTime.parse(
+                      '${DateTimeHelper().getDateAfterNow()} ${timeAlarm}')) !=
+              null)) {
+        ToastPopup()
+            .showAlert(message: 'Data alarm dengan waktu yang sama sudah ada!');
+      } else {
+        NotificationAlarm data = NotificationAlarm(
+            controlSocket,
+            controlType,
+            AlarmSettings(
+              id: notificationAlarm.isEmpty
+                  ? 1
+                  : notificationAlarm.last.alarmSettings!.id + 1,
+              dateTime: DateTime.parse(
+                  '${DateTimeHelper().getDateNow()} ${timeAlarm}'),
+              assetAudioPath: 'assets/audio/alarmtone.mp3',
+              loopAudio: true,
+              vibrate: true,
+              fadeDuration: 3.0,
+              notificationTitle: alarmName,
+              notificationBody: 'Klik disini untuk menonaktifkan notifikasi',
+              enableNotificationOnKill: true,
+            ));
+        notificationAlarm.add(data);
+        dbServices.updateNotificationData(
+            listNotificationAlarm: notificationAlarm);
+        update();
+        ToastPopup().showSucess(message: 'Pengingat berhasil ditambahkan!');
+        print(data.alarmSettings);
+        await setAlarm(data: data.alarmSettings!);
+      }
+    } catch (e) {
+      print(e);
+    }
+  }
+
+  editNotificationAlarm(
+      {required int idAlarm,
+      required String timeAlarm,
       required String alarmName,
       required ControlSocket controlSocket,
       required ControlType controlType}) async {
@@ -98,11 +161,10 @@ class NotificationController extends GetxController {
               enableNotificationOnKill: true,
             ));
         notificationAlarm.add(data);
-        dbServices.saveNotificationData(notificationAlarm: data);
+        dbServices.updateNotificationData(
+            listNotificationAlarm: notificationAlarm);
         update();
         ToastPopup().showSucess(message: 'Pengingat berhasil ditambahkan!');
-        print(data.alarmSettings);
-        await setAlarm(data: data.alarmSettings!);
       }
     } catch (e) {
       print(e);
@@ -164,8 +226,6 @@ class NotificationController extends GetxController {
         print('Alarm failed');
       }
     }
-    List<NotificationAlarm> datsa = await dbServices.getAllNotificationData();
-    print(datsa.first.toJson());
     update();
   }
 

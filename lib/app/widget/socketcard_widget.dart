@@ -8,8 +8,12 @@ import 'package:smartsocket/app/theme/font_theme.dart';
 class SocketCardWidget extends StatelessWidget {
   final Socket? socket;
   final Function onTap;
+  final Function onEditTap;
   const SocketCardWidget(
-      {super.key, required this.socket, required this.onTap});
+      {super.key,
+      required this.socket,
+      required this.onTap,
+      required this.onEditTap});
 
   @override
   Widget build(BuildContext context) {
@@ -39,7 +43,7 @@ class SocketCardWidget extends StatelessWidget {
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               SvgPicture.asset(
-                'assets/icon/ic-sunfog.svg',
+                'assets/icon/ic-flash.svg',
                 height: 46.w,
                 width: 46.w,
                 color: socket!.value == true
@@ -47,7 +51,9 @@ class SocketCardWidget extends StatelessWidget {
                     : ClrTheme.clrDarkGray,
               ),
               Text(
-                socket!.location.toString(),
+                socket!.description.toString(),
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
                 style: FontTheme.medium.copyWith(
                     fontSize: 12.sp,
                     color: socket!.value == true
@@ -119,21 +125,26 @@ class SocketCardWidget extends StatelessWidget {
           ),
           Align(
             alignment: Alignment.topRight,
-            child: AnimatedContainer(
-              duration: Duration(milliseconds: 250),
-              padding: EdgeInsets.all(4.w),
-              height: 24.w,
-              width: 24.w,
-              decoration: BoxDecoration(
+            child: GestureDetector(
+              onTap: () {
+                onEditTap();
+              },
+              child: AnimatedContainer(
+                duration: Duration(milliseconds: 250),
+                padding: EdgeInsets.all(4.w),
+                height: 24.w,
+                width: 24.w,
+                decoration: BoxDecoration(
+                    color: socket!.value == true
+                        ? ClrTheme.clrTeal
+                        : ClrTheme.clrDarkBlue,
+                    borderRadius: BorderRadius.circular(4.r)),
+                child: SvgPicture.asset(
+                  'assets/icon/ic-edit.svg',
                   color: socket!.value == true
-                      ? ClrTheme.clrTeal
-                      : ClrTheme.clrDarkBlue,
-                  borderRadius: BorderRadius.circular(4.r)),
-              child: SvgPicture.asset(
-                'assets/icon/ic-edit.svg',
-                color: socket!.value == true
-                    ? ClrTheme.clrDarkBlue
-                    : ClrTheme.clrWhite,
+                      ? ClrTheme.clrDarkBlue
+                      : ClrTheme.clrWhite,
+                ),
               ),
             ),
           )

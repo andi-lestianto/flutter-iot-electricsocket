@@ -43,7 +43,8 @@ class NotificationView extends GetView<NotificationController> {
                       splashColor: ClrTheme.clrTransparent,
                       onTap: () {
                         _.clearAlarmForm();
-                        ConfigureNotificationDialog().dialogShow(context);
+                        ConfigureNotificationDialog()
+                            .dialogShow(context, isEdit: false);
                       },
                       child: Padding(
                         padding: EdgeInsets.symmetric(vertical: 9.w),
@@ -119,6 +120,14 @@ class NotificationView extends GetView<NotificationController> {
                                                       .notificationAlarm[index]
                                                       .alarmSettings!);
                                             },
+                                            onTap: () {
+                                              _.fillAlarmForm(
+                                                  data: _.notificationAlarm[
+                                                      index]);
+                                              ConfigureNotificationDialog()
+                                                  .dialogShow(context,
+                                                      isEdit: true);
+                                            },
                                           ),
                                         ),
                                       ))
@@ -137,54 +146,85 @@ class NotificationView extends GetView<NotificationController> {
   showConfirmDialog(BuildContext context, {required Function onDelete}) async {
     return await showDialog(
       context: context,
-      builder: (BuildContext context) {
-        return AlertDialog(
-          title: Text(
-            'Konfirmasi',
-            style: FontTheme.semibold
-                .copyWith(color: ClrTheme.clrDarkGray, fontSize: 16.sp),
-          ),
-          content: Text(
-            'Yakin ingin menghapus data',
-            style: FontTheme.base
-                .copyWith(fontSize: 14.sp, color: ClrTheme.clrDarkGray),
-          ),
-          actions: <Widget>[
-            ElevatedButton(
-                style: ElevatedButton.styleFrom(
-                    elevation: 0,
-                    backgroundColor: ClrTheme.clrError,
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(8.r),
-                    )),
-                onPressed: () {
-                  Navigator.of(context).pop(true);
-                  onDelete();
-                },
-                child: Text(
-                  'Hapus',
-                  style: FontTheme.base
-                      .copyWith(fontSize: 12.sp, color: ClrTheme.clrWhite),
-                )),
-            ElevatedButton(
-              style: ElevatedButton.styleFrom(
-                  elevation: 0,
-                  backgroundColor: ClrTheme.clrWhiteGray,
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(8.r),
-                  )),
-              onPressed: () {
-                Navigator.of(context).pop(false);
-              },
-              child: Text(
-                'Batal',
-                style: FontTheme.base
-                    .copyWith(fontSize: 12.sp, color: ClrTheme.clrBlack),
+      builder: (context) => AlertDialog(
+        elevation: 0,
+        backgroundColor: ClrTheme.clrTransparent,
+        content: Container(
+          padding: EdgeInsets.all(24.w),
+          decoration: BoxDecoration(
+              borderRadius: BorderRadius.circular(8.r),
+              color: ClrTheme.clrWhite),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Text(
+                'Hapus Data?',
+                style: FontTheme.bold.copyWith(fontSize: 16.sp),
               ),
-            ),
-          ],
-        );
-      },
+              SizedBox(
+                height: 8.w,
+              ),
+              Text(
+                'Yakin Ingin Menghapus Data?',
+                style: FontTheme.regular.copyWith(fontSize: 12.sp),
+              ),
+              SizedBox(
+                height: 16.w,
+              ),
+              Row(
+                children: [
+                  Expanded(
+                    child: GestureDetector(
+                      onTap: () {
+                        Navigator.of(context).pop(false);
+                      },
+                      child: Container(
+                        padding: EdgeInsets.symmetric(
+                            horizontal: 8.w, vertical: 4.w),
+                        decoration: BoxDecoration(
+                            borderRadius: BorderRadius.circular(4.r),
+                            color: ClrTheme.clrWhiteGray,
+                            border: Border.all(
+                                width: 2, color: ClrTheme.clrWhiteGray)),
+                        child: Center(
+                          child: Text('Tidak',
+                              style:
+                                  FontTheme.regular.copyWith(fontSize: 12.sp)),
+                        ),
+                      ),
+                    ),
+                  ),
+                  SizedBox(
+                    width: 16.w,
+                  ),
+                  Expanded(
+                    child: GestureDetector(
+                      onTap: () {
+                        Navigator.of(context).pop(true);
+                        onDelete();
+                      },
+                      child: Container(
+                        padding: EdgeInsets.symmetric(
+                            horizontal: 8.w, vertical: 4.w),
+                        decoration: BoxDecoration(
+                            borderRadius: BorderRadius.circular(4.r),
+                            color: ClrTheme.clrGold,
+                            border:
+                                Border.all(width: 2, color: ClrTheme.clrGold)),
+                        child: Center(
+                          child: Text('Ya',
+                              style: FontTheme.regular.copyWith(
+                                  fontSize: 12.sp, color: ClrTheme.clrWhite)),
+                        ),
+                      ),
+                    ),
+                  ),
+                ],
+              )
+            ],
+          ),
+        ),
+      ),
     );
   }
 }
