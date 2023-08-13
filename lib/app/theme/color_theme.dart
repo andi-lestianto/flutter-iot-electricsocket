@@ -8,4 +8,7 @@ class ClrTheme {
   static const Color clrTeal = Color(0xFF33C3A2);
   static const Color clrTransparent = Color(0x00000000);
   static const Color clrDarkGray = Color(0xFF262A2D);
+  static const Color clrError = Color(0xFFD3212C);
+  static const Color clrSuccess = Color(0xFF069C56);
+  static const Color clrBlack = Color(0xFF000000);
 }

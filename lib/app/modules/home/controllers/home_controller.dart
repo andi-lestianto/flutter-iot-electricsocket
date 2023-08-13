@@ -5,24 +5,14 @@ import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_database/firebase_database.dart';
 import 'package:get/get.dart';
 import 'package:smartsocket/app/data/mainsocket_model.dart';
+import 'package:smartsocket/app/data/notification_model.dart';
+import 'package:smartsocket/app/helper/controlenum_helper.dart';
 
 class HomeController extends GetxController {
   DatabaseReference ref = FirebaseDatabase.instance.ref('data');
   MainSocket? mainSocket;
 
-  late StreamSubscription<DatabaseEvent> counterSubscription;
-
-  Future readSocketValue() async {
-    print('object');
-    final snapshot = await ref.get();
-    if (snapshot.exists) {
-      print(jsonEncode(snapshot.value));
-      mainSocket = MainSocket.fromJson(jsonDecode(jsonEncode(snapshot.value)));
-    } else {
-      print('No data available.');
-    }
-    update();
-  }
+  late StreamSubscription<DatabaseEvent> socketSubscription;
 
   Future setSocketValue({required String socketName}) async {
     final Socket? socket = await getSpecificSocketValue(socketName: socketName);
@@ -49,21 +39,36 @@ class HomeController extends GetxController {
     }
   }
 
-  tes(DatabaseEvent event) {
+  updateMainSocket(DatabaseEvent event) {
     mainSocket =
         MainSocket.fromJson(jsonDecode(jsonEncode(event.snapshot.value)));
     update();
   }
 
-  final count = 0.obs;
+  Future setSocketValueFromAlarm(
+      {required ControlSocket controlSocket,
+      required ControlType controlType}) async {
+    String socketName = ControlEnumHelper()
+        .getStringControlSocket(controlSocketEnum: controlSocket);
+
+    bool value = controlType == ControlType.turnoff ? false : true;
+
+    await ref.update({
+      socketName: {
+        'imgpath': 'assets/icon/ic_lamp.svg',
+        'location': 'Living Room',
+        'value': value
+      }
+    });
+  }
+
   @override
   void onInit() {
     super.onInit();
-    print('Hooiiii');
-    counterSubscription = ref.onValue.listen(
+    socketSubscription = ref.onValue.listen(
       (DatabaseEvent event) {
         print(event.snapshot.value);
-        tes(event);
+        updateMainSocket(event);
       },
       onError: (Object o) {
         final error = o as FirebaseException;
@@ -79,5 +84,4 @@ class HomeController extends GetxController {
 
   @override
   void onClose() {}
-  void increment() => count.value++;
 }

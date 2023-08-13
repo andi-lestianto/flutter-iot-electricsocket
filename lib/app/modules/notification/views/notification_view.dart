@@ -42,7 +42,8 @@ class NotificationView extends GetView<NotificationController> {
                       highlightColor: Colors.transparent,
                       splashColor: ClrTheme.clrTransparent,
                       onTap: () {
-                        ConfigureNotificationDialog().dialogShow();
+                        _.clearAlarmForm();
+                        ConfigureNotificationDialog().dialogShow(context);
                       },
                       child: Padding(
                         padding: EdgeInsets.symmetric(vertical: 9.w),
@@ -82,22 +83,108 @@ class NotificationView extends GetView<NotificationController> {
                           ],
                         ),
                       )
-                    : Column(
-                        children: [
-                          ...List.generate(
-                              _.notificationAlarm.length,
-                              (index) => NotificationCardWidget(
-                                    onTap: () {
-                                      // _.getAlarm();
-                                    },
-                                  ))
-                        ],
+                    : Expanded(
+                        child: SingleChildScrollView(
+                          physics: BouncingScrollPhysics(),
+                          child: Column(
+                            children: [
+                              ...List.generate(
+                                  _.notificationAlarm.length,
+                                  (index) => Dismissible(
+                                        key: ValueKey(index),
+                                        direction: DismissDirection.endToStart,
+                                        onDismissed: (direction) async {},
+                                        confirmDismiss: (direction) async {
+                                          return await showConfirmDialog(
+                                              context, onDelete: () {
+                                            _.deleteNotificationAlarm(
+                                                data:
+                                                    _.notificationAlarm[index]);
+                                          });
+                                        },
+                                        child: FutureBuilder(
+                                          future: _.getAlarm(
+                                              id: _.notificationAlarm[index]
+                                                  .alarmSettings!.id),
+                                          builder: (context, snapshot) =>
+                                              NotificationCardWidget(
+                                            isActive: snapshot.data == null
+                                                ? false
+                                                : snapshot.data!,
+                                            data: _.notificationAlarm[index],
+                                            onIconTap: () async {
+                                              // _.tesDate();
+                                              await _.setAlarm(
+                                                  data: _
+                                                      .notificationAlarm[index]
+                                                      .alarmSettings!);
+                                            },
+                                          ),
+                                        ),
+                                      ))
+                            ],
+                          ),
+                        ),
                       )
               ],
             ),
           ),
         ),
       ),
+    );
+  }
+
+  showConfirmDialog(BuildContext context, {required Function onDelete}) async {
+    return await showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Text(
+            'Konfirmasi',
+            style: FontTheme.semibold
+                .copyWith(color: ClrTheme.clrDarkGray, fontSize: 16.sp),
+          ),
+          content: Text(
+            'Yakin ingin menghapus data',
+            style: FontTheme.base
+                .copyWith(fontSize: 14.sp, color: ClrTheme.clrDarkGray),
+          ),
+          actions: <Widget>[
+            ElevatedButton(
+                style: ElevatedButton.styleFrom(
+                    elevation: 0,
+                    backgroundColor: ClrTheme.clrError,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(8.r),
+                    )),
+                onPressed: () {
+                  Navigator.of(context).pop(true);
+                  onDelete();
+                },
+                child: Text(
+                  'Hapus',
+                  style: FontTheme.base
+                      .copyWith(fontSize: 12.sp, color: ClrTheme.clrWhite),
+                )),
+            ElevatedButton(
+              style: ElevatedButton.styleFrom(
+                  elevation: 0,
+                  backgroundColor: ClrTheme.clrWhiteGray,
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(8.r),
+                  )),
+              onPressed: () {
+                Navigator.of(context).pop(false);
+              },
+              child: Text(
+                'Batal',
+                style: FontTheme.base
+                    .copyWith(fontSize: 12.sp, color: ClrTheme.clrBlack),
+              ),
+            ),
+          ],
+        );
+      },
     );
   }
 }

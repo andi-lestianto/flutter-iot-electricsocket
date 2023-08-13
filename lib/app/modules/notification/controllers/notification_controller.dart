@@ -1,53 +1,196 @@
 import 'package:alarm/alarm.dart';
+import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:smartsocket/app/data/notification_model.dart';
+import 'package:smartsocket/app/database/db_services.dart';
 import 'package:smartsocket/app/helper/datetime_helper.dart';
+import 'package:smartsocket/app/widget/toast_widget.dart';
 
 class NotificationController extends GetxController {
-  //TODO: Implement NotificationController
+  final DBServices dbServices = DBServices();
+  final TextEditingController nameController = TextEditingController();
+  String selectedTime = '00:00';
+
+  List<ControlSocket> listControlSocket = [
+    ControlSocket.none,
+    ControlSocket.socket1,
+    ControlSocket.socket2,
+    ControlSocket.socket3,
+    ControlSocket.socket4,
+  ];
+  ControlSocket selectedControlSocket = ControlSocket.none;
+
+  setSelectedControlSocket({required ControlSocket controlSocket}) {
+    selectedControlSocket = controlSocket;
+    if (controlSocket == ControlSocket.none) {
+      selectedControlType = ControlType.none;
+    }
+    update();
+  }
+
+  List<ControlType> listControlType = [
+    ControlType.none,
+    ControlType.turnoff,
+    ControlType.turnon
+  ];
+
+  ControlType selectedControlType = ControlType.none;
+
+  setSelectedControlType({required ControlType controlType}) {
+    selectedControlType = controlType;
+    update();
+  }
+
+  setSelectedTime({required TimeOfDay timeOfDay}) {
+    String? jam;
+    String? menit;
+    if (timeOfDay.hour.toString().length == 1) {
+      jam = '0${timeOfDay.hour}';
+    } else {
+      jam = '${timeOfDay.hour}';
+    }
+
+    if (timeOfDay.minute.toString().length == 1) {
+      menit = '0${timeOfDay.minute}';
+    } else {
+      menit = '${timeOfDay.minute}';
+    }
+    selectedTime = '${jam}:${menit}';
+    update();
+  }
 
   List<NotificationAlarm> notificationAlarm = [];
 
-  List<AlarmSettings> alarmSettting = [];
-
-  addNotificationAlarm(
-      {required DateTime timeAlarm, required String alarmName}) {
-    notificationAlarm.add(NotificationAlarm(
-        false,
-        AlarmSettings(
-          id: alarmSettting.isEmpty ? 1 : alarmSettting.last.id + 1,
-          dateTime: DateTime.parse(
-              '${DateTimeHelper().getDateNow()} ${timeAlarm.toString().split(' ').last}'),
-          assetAudioPath: 'assets/audio/alarmtone.mp3',
-          loopAudio: true,
-          vibrate: true,
-          fadeDuration: 3.0,
-          notificationTitle: alarmName,
-          notificationBody: 'Klik disini untuk menonaktifkan notifikasi',
-          enableNotificationOnKill: true,
-        )));
+  clearAlarmForm() {
+    nameController.clear();
+    selectedControlSocket = ControlSocket.none;
+    selectedControlType = ControlType.none;
+    setSelectedTime(timeOfDay: TimeOfDay.now());
   }
 
-  setAlarm({required AlarmSettings alarmSettings}) async {
-    final response = await Alarm.set(alarmSettings: alarmSettings);
-    if (response) {
-      print('Alarm setted');
-    } else {
-      print('Alarm failed');
+  addNotificationAlarm(
+      {required String timeAlarm,
+      required String alarmName,
+      required ControlSocket controlSocket,
+      required ControlType controlType}) async {
+    try {
+      if (alarmName == '') {
+        ToastPopup().showAlert(message: 'Nama pengingat wajib diisi!');
+      } else if (controlSocket != ControlSocket.none &&
+          controlType == ControlType.none) {
+        ToastPopup().showAlert(message: 'Type kontrol tidak boleh \'none\'');
+      } else {
+        NotificationAlarm data = NotificationAlarm(
+            controlSocket,
+            controlType,
+            AlarmSettings(
+              id: notificationAlarm.isEmpty
+                  ? 1
+                  : notificationAlarm.last.alarmSettings!.id + 1,
+              dateTime: DateTime.parse(
+                  '${DateTimeHelper().getDateNow()} ${timeAlarm}'),
+              assetAudioPath: 'assets/audio/alarmtone.mp3',
+              loopAudio: true,
+              vibrate: true,
+              fadeDuration: 3.0,
+              notificationTitle: alarmName,
+              notificationBody: 'Klik disini untuk menonaktifkan notifikasi',
+              enableNotificationOnKill: true,
+            ));
+        notificationAlarm.add(data);
+        dbServices.saveNotificationData(notificationAlarm: data);
+        update();
+        ToastPopup().showSucess(message: 'Pengingat berhasil ditambahkan!');
+        print(data.alarmSettings);
+        await setAlarm(data: data.alarmSettings!);
+      }
+    } catch (e) {
+      print(e);
     }
   }
 
-  getAlarm() async {
-    final response = await Alarm.getAlarm(42);
-    print(response?.notificationTitle);
-    print('object');
+  deleteNotificationAlarm({required NotificationAlarm data}) async {
+    final response = await Alarm.getAlarm(data.alarmSettings!.id);
+    if (response != null) {
+      Alarm.stop(response.id);
+    }
+    notificationAlarm.removeWhere(
+        (element) => element.alarmSettings!.id == data.alarmSettings!.id);
+    dbServices.updateNotificationData(listNotificationAlarm: notificationAlarm);
+    update();
   }
 
-  final count = 0.obs;
+  tesDate() {
+    print(DateTimeHelper().getDateNow());
+    print(DateTimeHelper().getDateAfterNow());
+
+    DateTime dateAlarm = DateTime.parse('2023-08-13 19:11:26');
+    print(dateAlarm.isAfter(DateTime.now()));
+  }
+
+  Future setAlarm({required AlarmSettings data}) async {
+    if (await getAlarm(id: data.id)) {
+      Alarm.stop(data.id);
+    } else {
+      bool? response;
+      if (data.dateTime.isBefore(DateTime.now())) {
+        print('jam sebelum sekarang');
+        NotificationAlarm? currentNotificationAlarm =
+            notificationAlarm.firstWhereOrNull(
+                (element) => element.alarmSettings!.id == data.id);
+
+        if (currentNotificationAlarm != null) {
+          DateTime currentAlarmDate =
+              currentNotificationAlarm.alarmSettings!.dateTime;
+          if (currentAlarmDate.isBefore(DateTime.now())) {
+            String timeAlarm = currentAlarmDate.toString().split(' ').last;
+
+            currentNotificationAlarm.alarmSettings =
+                currentNotificationAlarm.alarmSettings!.copyWith(
+                    dateTime: DateTime.parse(
+                        '${DateTimeHelper().getDateAfterNow()} ${timeAlarm}'));
+          }
+        }
+        dbServices.updateNotificationData(
+            listNotificationAlarm: notificationAlarm);
+        response = await Alarm.set(
+            alarmSettings: currentNotificationAlarm!.alarmSettings!);
+      } else {
+        response = await Alarm.set(alarmSettings: data);
+      }
+      if (response) {
+        print('Alarm setted');
+      } else {
+        print('Alarm failed');
+      }
+    }
+    List<NotificationAlarm> datsa = await dbServices.getAllNotificationData();
+    print(datsa.first.toJson());
+    update();
+  }
+
+  Future<bool> getAlarm({required int id}) async {
+    final response = await Alarm.getAlarm(id);
+    if (response != null) {
+      return true;
+    } else {
+      return false;
+    }
+  }
+
+  getDataNotificationFromLocal() async {
+    List<NotificationAlarm> data = await dbServices.getAllNotificationData();
+    if (data.isNotEmpty) {
+      notificationAlarm.addAll(data);
+    }
+
+    await Future.delayed(Duration.zero).then((value) => update());
+  }
+
   @override
   void onInit() {
     super.onInit();
-    // setAlarm();
+    getDataNotificationFromLocal();
   }
 
   @override
@@ -57,5 +200,4 @@ class NotificationController extends GetxController {
 
   @override
   void onClose() {}
-  void increment() => count.value++;
 }

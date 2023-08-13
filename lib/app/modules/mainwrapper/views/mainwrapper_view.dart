@@ -67,7 +67,9 @@ class MainwrapperView extends GetView<MainwrapperController> {
                     }
                   },
                   child: SvgPicture.asset(
-                    'assets/icon/nav/ic-home.svg',
+                    _.currentRoutes == Routes.HOME
+                        ? 'assets/icon/nav/ic-home-active.svg'
+                        : 'assets/icon/nav/ic-home.svg',
                     height: 38.w,
                     width: 38.w,
                   ),
@@ -80,7 +82,9 @@ class MainwrapperView extends GetView<MainwrapperController> {
                     }
                   },
                   child: SvgPicture.asset(
-                    'assets/icon/nav/ic-notification.svg',
+                    _.currentRoutes == Routes.NOTIFICATION
+                        ? 'assets/icon/nav/ic-notification-active.svg'
+                        : 'assets/icon/nav/ic-notification.svg',
                     height: 38.w,
                     width: 38.w,
                   ),

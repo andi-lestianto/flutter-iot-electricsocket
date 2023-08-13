@@ -5,7 +5,11 @@ class MainwrapperController extends GetxController {
   String currentRoutes = Routes.HOME;
 
   void updateCurrentRoutes(String route) async {
-    currentRoutes = route;
+    if (route == '/') {
+      currentRoutes = Routes.HOME;
+    } else {
+      currentRoutes = route;
+    }
     await Future.delayed(Duration.zero).then((value) => update());
   }
 
