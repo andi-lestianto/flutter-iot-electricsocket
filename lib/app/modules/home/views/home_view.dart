@@ -1,8 +1,11 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 
 import 'package:get/get.dart';
+import 'package:smartsocket/app/data/user_model.dart';
 import 'package:smartsocket/app/helper/datetime_helper.dart';
 import 'package:smartsocket/app/modules/notification/dialog/configurenotification_dialog.dart';
 import 'package:smartsocket/app/theme/color_theme.dart';
@@ -33,16 +36,36 @@ class HomeView extends GetView<HomeController> {
                           style: FontTheme.regular.copyWith(fontSize: 12.sp),
                         ),
                         Text(
-                          'Andi Lestianto',
+                          _.userModel == null
+                              ? 'User'
+                              : _.userModel!.nama!.toString(),
                           style: FontTheme.bold.copyWith(fontSize: 16.sp),
                         )
                       ],
                     ),
-                    Image.asset(
-                      'assets/image/img-profile.png',
-                      width: 48.w,
-                      height: 48.w,
-                    )
+                    GestureDetector(
+                        onTap: () {
+                          configureUserUpdate().dialogShow();
+                        },
+                        child: _.userModel == null
+                            ? Container(
+                                padding: EdgeInsets.all(8.w),
+                                height: 48.w,
+                                width: 48.w,
+                                child: SvgPicture.asset(
+                                  'assets/icon/ic-user.svg',
+                                ),
+                              )
+                            : ClipOval(
+                                child: SizedBox(
+                                  height: 48.w,
+                                  width: 48.w,
+                                  child: Image.file(
+                                    File(_.userModel!.profilePict.toString()),
+                                    fit: BoxFit.cover,
+                                  ),
+                                ),
+                              ))
                   ],
                 ),
                 SizedBox(
@@ -109,15 +132,15 @@ class HomeView extends GetView<HomeController> {
                               _.setTextController(
                                   text: _.mainSocket!.socket1!.description
                                       .toString());
-                              configureSocketDesc().dialogShow(context,
+                              configureSocketDesc().dialogShow(
                                   socketId: 'Socket 1',
                                   socket: _.mainSocket!.socket1!,
                                   textEditingController: _.labelController,
                                   onSave: () {
-                                _.setSocketLabel(
-                                    socketName: 'socket1',
-                                    labelName: _.labelController.text);
-                              });
+                                    _.setSocketLabel(
+                                        socketName: 'socket1',
+                                        labelName: _.labelController.text);
+                                  });
                             },
                           ),
                           SocketCardWidget(
@@ -130,15 +153,15 @@ class HomeView extends GetView<HomeController> {
                                   text: _.mainSocket!.socket2!.description
                                       .toString());
 
-                              configureSocketDesc().dialogShow(context,
+                              configureSocketDesc().dialogShow(
                                   socketId: 'Socket 2',
                                   socket: _.mainSocket!.socket2!,
                                   textEditingController: _.labelController,
                                   onSave: () {
-                                _.setSocketLabel(
-                                    socketName: 'socket2',
-                                    labelName: _.labelController.text);
-                              });
+                                    _.setSocketLabel(
+                                        socketName: 'socket2',
+                                        labelName: _.labelController.text);
+                                  });
                             },
                           ),
                           SocketCardWidget(
@@ -151,15 +174,15 @@ class HomeView extends GetView<HomeController> {
                                   text: _.mainSocket!.socket3!.description
                                       .toString());
 
-                              configureSocketDesc().dialogShow(context,
+                              configureSocketDesc().dialogShow(
                                   socketId: 'Socket 3',
                                   socket: _.mainSocket!.socket3!,
                                   textEditingController: _.labelController,
                                   onSave: () {
-                                _.setSocketLabel(
-                                    socketName: 'socket3',
-                                    labelName: _.labelController.text);
-                              });
+                                    _.setSocketLabel(
+                                        socketName: 'socket3',
+                                        labelName: _.labelController.text);
+                                  });
                             },
                           ),
                           SocketCardWidget(
@@ -172,15 +195,15 @@ class HomeView extends GetView<HomeController> {
                                   text: _.mainSocket!.socket4!.description
                                       .toString());
 
-                              configureSocketDesc().dialogShow(context,
+                              configureSocketDesc().dialogShow(
                                   socketId: 'Socket 4',
                                   socket: _.mainSocket!.socket4!,
                                   textEditingController: _.labelController,
                                   onSave: () {
-                                _.setSocketLabel(
-                                    socketName: 'socket4',
-                                    labelName: _.labelController.text);
-                              });
+                                    _.setSocketLabel(
+                                        socketName: 'socket4',
+                                        labelName: _.labelController.text);
+                                  });
                             },
                           ),
                         ]),

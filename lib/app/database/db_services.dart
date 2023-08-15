@@ -1,7 +1,9 @@
 import 'dart:convert';
 
+import 'package:get/get_connect/http/src/utils/utils.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:smartsocket/app/data/notification_model.dart';
+import 'package:smartsocket/app/data/user_model.dart';
 
 class DBServices {
   Future<List<NotificationAlarm>> getAllNotificationData() async {
@@ -31,5 +33,29 @@ class DBServices {
     } else {
       print('Failed to save notification data to local');
     }
+  }
+
+  Future<bool> saveUserData(UserModel userModel) async {
+    final SharedPreferences sp = await SharedPreferences.getInstance();
+    Map<String, dynamic> userJson = userModel.toJson();
+    final response = await sp.setString('userData', jsonEncode(userJson));
+    if (response) {
+      print('User Data Saved');
+      return true;
+    } else {
+      print('Failed to save user data');
+      return false;
+    }
+  }
+
+  Future<Map<String, dynamic>?> getUserData() async {
+    Map<String, dynamic>? userJson;
+    final SharedPreferences sp = await SharedPreferences.getInstance();
+    final response = await sp.getString('userData');
+    if (response != null) {
+      userJson = jsonDecode(response);
+    }
+
+    return userJson;
   }
 }

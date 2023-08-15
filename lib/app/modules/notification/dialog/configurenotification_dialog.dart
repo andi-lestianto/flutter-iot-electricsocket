@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:get/get.dart';
@@ -9,6 +10,7 @@ import 'package:smartsocket/app/modules/home/controllers/home_controller.dart';
 import 'package:smartsocket/app/modules/notification/controllers/notification_controller.dart';
 import 'package:smartsocket/app/theme/color_theme.dart';
 import 'package:smartsocket/app/theme/font_theme.dart';
+import 'package:smartsocket/app/widget/toast_widget.dart';
 
 class ConfigureNotificationDialog {
   dialogShow(BuildContext context, {required bool isEdit}) {
@@ -241,17 +243,17 @@ class ConfigureNotificationDialog {
 }
 
 class configureSocketDesc {
-  dialogShow(BuildContext context,
+  dialogShow(
       {required String socketId,
       required Socket socket,
       required TextEditingController textEditingController,
       required Function onSave}) {
-    return showDialog(
-      context: context,
-      builder: (context) => AlertDialog(
+    return Get.dialog(
+      AlertDialog(
         elevation: 0,
         backgroundColor: ClrTheme.clrTransparent,
         content: Container(
+          width: 1.sw,
           padding: EdgeInsets.all(24.w),
           decoration: BoxDecoration(
               borderRadius: BorderRadius.circular(8.r),
@@ -322,6 +324,254 @@ class configureSocketDesc {
                                 Border.all(width: 2, color: ClrTheme.clrGold)),
                         child: Center(
                           child: Text('Simpan',
+                              style: FontTheme.regular.copyWith(
+                                  fontSize: 12.sp, color: ClrTheme.clrWhite)),
+                        ),
+                      ),
+                    ),
+                  ),
+                ],
+              )
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+class configureUserUpdate {
+  dialogShow({bool? isFirst}) {
+    return Get.dialog(
+      WillPopScope(
+        onWillPop: () async {
+          if (isFirst == true) {
+            ToastPopup().showAlert(
+                message:
+                    'Wajib memasukkan nama & foto saat pertama kali masuk ke aplikasi');
+            return false;
+          }
+          return true;
+        },
+        child: GetBuilder<HomeController>(
+          initState: (state) {
+            final HomeController hc = Get.find();
+            hc.clearUserForm();
+          },
+          builder: (_) => AlertDialog(
+            elevation: 0,
+            backgroundColor: ClrTheme.clrTransparent,
+            content: Container(
+              width: 1.sw,
+              padding: EdgeInsets.all(24.w),
+              decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(8.r),
+                  color: ClrTheme.clrWhite),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Center(
+                    child: Text(
+                      isFirst == true ? 'Konfigurasi' : 'Ubah Data',
+                      style: FontTheme.bold.copyWith(fontSize: 16.sp),
+                    ),
+                  ),
+                  SizedBox(
+                    height: 8.w,
+                  ),
+                  Text('Nama :',
+                      style: FontTheme.regular.copyWith(fontSize: 12.sp)),
+                  SizedBox(
+                    height: 8.w,
+                  ),
+                  TextField(
+                    controller: _.nameController,
+                    cursorColor: ClrTheme.clrGold,
+                    style: FontTheme.regular.copyWith(fontSize: 12.sp),
+                    decoration: InputDecoration(
+                        filled: true,
+                        fillColor: ClrTheme.clrWhiteGray,
+                        border: OutlineInputBorder(
+                            borderSide: BorderSide.none,
+                            borderRadius: BorderRadius.circular(12.r))),
+                  ),
+                  SizedBox(
+                    height: 16.w,
+                  ),
+                  Text('Foto Profil :',
+                      style: FontTheme.regular.copyWith(fontSize: 12.sp)),
+                  SizedBox(
+                    height: 8.w,
+                  ),
+                  Row(
+                    children: [
+                      Expanded(
+                        child: Text(
+                            _.pickedFoto == null
+                                ? 'Belum ada file dipilih!'
+                                : _.pickedFoto!.name,
+                            style: FontTheme.italic.copyWith(
+                              fontSize: 12.sp,
+                            )),
+                      ),
+                      SizedBox(
+                        width: 8.w,
+                      ),
+                      GestureDetector(
+                        onTap: () {
+                          _.pickFotoProfile();
+                        },
+                        child: Container(
+                          padding: EdgeInsets.all(12.w),
+                          height: 42.w,
+                          width: 42.w,
+                          decoration: BoxDecoration(
+                              color: ClrTheme.clrWhiteGray,
+                              borderRadius: BorderRadius.circular(12.r)),
+                          child: SvgPicture.asset('assets/icon/ic-clock.svg'),
+                        ),
+                      ),
+                    ],
+                  ),
+                  SizedBox(
+                    height: 16.w,
+                  ),
+                  Row(
+                    children: [
+                      Expanded(
+                        child: GestureDetector(
+                          onTap: () {
+                            if (isFirst == true) {
+                              SystemNavigator.pop();
+                            } else {
+                              Get.back();
+                            }
+                          },
+                          child: Container(
+                            padding: EdgeInsets.symmetric(
+                                horizontal: 8.w, vertical: 4.w),
+                            decoration: BoxDecoration(
+                                borderRadius: BorderRadius.circular(4.r),
+                                color: ClrTheme.clrWhiteGray,
+                                border: Border.all(
+                                    width: 2, color: ClrTheme.clrWhiteGray)),
+                            child: Center(
+                              child: Text(
+                                  isFirst == true ? 'Keluar' : 'Kembali',
+                                  style: FontTheme.regular
+                                      .copyWith(fontSize: 12.sp)),
+                            ),
+                          ),
+                        ),
+                      ),
+                      SizedBox(
+                        width: 16.w,
+                      ),
+                      Expanded(
+                        child: GestureDetector(
+                          onTap: () {
+                            _.saveProfile();
+                          },
+                          child: Container(
+                            padding: EdgeInsets.symmetric(
+                                horizontal: 8.w, vertical: 4.w),
+                            decoration: BoxDecoration(
+                                borderRadius: BorderRadius.circular(4.r),
+                                color: ClrTheme.clrGold,
+                                border: Border.all(
+                                    width: 2, color: ClrTheme.clrGold)),
+                            child: Center(
+                              child: Text('Simpan',
+                                  style: FontTheme.regular.copyWith(
+                                      fontSize: 12.sp,
+                                      color: ClrTheme.clrWhite)),
+                            ),
+                          ),
+                        ),
+                      ),
+                    ],
+                  )
+                ],
+              ),
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+class exitConfirmationDialog {
+  show() {
+    Get.dialog(
+      AlertDialog(
+        elevation: 0,
+        backgroundColor: ClrTheme.clrTransparent,
+        content: Container(
+          width: 1.sw,
+          padding: EdgeInsets.all(24.w),
+          decoration: BoxDecoration(
+              borderRadius: BorderRadius.circular(8.r),
+              color: ClrTheme.clrWhite),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Text(
+                'Keluar Aplikasi?',
+                style: FontTheme.bold.copyWith(fontSize: 16.sp),
+              ),
+              SizedBox(
+                height: 8.w,
+              ),
+              Text(
+                'Yakin Ingin Keluar Aplikasi?',
+                style: FontTheme.regular.copyWith(fontSize: 12.sp),
+              ),
+              SizedBox(
+                height: 16.w,
+              ),
+              Row(
+                children: [
+                  Expanded(
+                    child: GestureDetector(
+                      onTap: () {
+                        Get.back();
+                      },
+                      child: Container(
+                        padding: EdgeInsets.symmetric(
+                            horizontal: 8.w, vertical: 4.w),
+                        decoration: BoxDecoration(
+                            borderRadius: BorderRadius.circular(4.r),
+                            color: ClrTheme.clrWhiteGray,
+                            border: Border.all(
+                                width: 2, color: ClrTheme.clrWhiteGray)),
+                        child: Center(
+                          child: Text('Tidak',
+                              style:
+                                  FontTheme.regular.copyWith(fontSize: 12.sp)),
+                        ),
+                      ),
+                    ),
+                  ),
+                  SizedBox(
+                    width: 16.w,
+                  ),
+                  Expanded(
+                    child: GestureDetector(
+                      onTap: () {
+                        SystemNavigator.pop();
+                      },
+                      child: Container(
+                        padding: EdgeInsets.symmetric(
+                            horizontal: 8.w, vertical: 4.w),
+                        decoration: BoxDecoration(
+                            borderRadius: BorderRadius.circular(4.r),
+                            color: ClrTheme.clrGold,
+                            border:
+                                Border.all(width: 2, color: ClrTheme.clrGold)),
+                        child: Center(
+                          child: Text('Ya',
                               style: FontTheme.regular.copyWith(
                                   fontSize: 12.sp, color: ClrTheme.clrWhite)),
                         ),
