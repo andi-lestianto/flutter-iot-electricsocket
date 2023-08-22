@@ -3,6 +3,7 @@ import 'package:alarm/alarm.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_native_splash/flutter_native_splash.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 import 'package:get/get.dart';
@@ -14,7 +15,8 @@ import 'package:smartsocket/app/modules/home/controllers/home_controller.dart';
 import 'app/routes/app_pages.dart';
 
 void main() async {
-  WidgetsFlutterBinding.ensureInitialized();
+  WidgetsBinding widgetsBinding = WidgetsFlutterBinding.ensureInitialized();
+  FlutterNativeSplash.preserve(widgetsBinding: widgetsBinding);
   SystemChrome.setPreferredOrientations([
     DeviceOrientation.portraitUp,
     DeviceOrientation.portraitDown,
@@ -27,6 +29,7 @@ void main() async {
   });
 
   runApp(MyApp());
+  FlutterNativeSplash.remove();
 }
 
 class MyApp extends StatelessWidget {
@@ -38,7 +41,9 @@ class MyApp extends StatelessWidget {
       designSize: const Size(360, 640),
       minTextAdapt: true,
       splitScreenMode: true,
+      useInheritedMediaQuery: true,
       builder: (context, child) => GetMaterialApp(
+        debugShowCheckedModeBanner: false,
         title: "Application",
         initialRoute: AppPages.INITIAL,
         getPages: AppPages.routes,
@@ -48,6 +53,7 @@ class MyApp extends StatelessWidget {
 }
 
 alarmAction(AlarmSettings event) async {
+  print('trogger alarm');
   final DBServices dbServices = DBServices();
   List<NotificationAlarm> notificationAlarm =
       await dbServices.getAllNotificationData();

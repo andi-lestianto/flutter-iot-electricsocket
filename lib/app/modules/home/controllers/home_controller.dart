@@ -1,10 +1,10 @@
 import 'dart:async';
 import 'dart:convert';
-import 'dart:io';
 
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/cupertino.dart';
+import 'package:flutter_background/flutter_background.dart';
 import 'package:get/get.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:smartsocket/app/data/mainsocket_model.dart';
@@ -99,15 +99,20 @@ class HomeController extends GetxController {
 
   Future setSocketLabel(
       {required String socketName, required String labelName}) async {
-    final Socket? socket = await getSpecificSocketValue(socketName: socketName);
-    if (socket != null) {
-      bool value = socket.value ?? false;
+    if (labelName == '') {
+      ToastPopup().showAlert(message: 'Label tidak boleh kosong!');
+    } else {
+      final Socket? socket =
+          await getSpecificSocketValue(socketName: socketName);
+      if (socket != null) {
+        bool value = socket.value ?? false;
 
-      await ref.update({
-        socketName: {'description': labelName, 'value': value}
-      });
-      Get.back();
-      ToastPopup().showSucess(message: 'Label berhasil diganti!');
+        await ref.update({
+          socketName: {'description': labelName, 'value': value}
+        });
+        Get.back();
+        ToastPopup().showSucess(message: 'Label berhasil diganti!');
+      }
     }
   }
 
@@ -143,20 +148,38 @@ class HomeController extends GetxController {
     }
   }
 
+  requetsBackgroundServices() async {
+    bool success = await FlutterBackground.initialize();
+    print(success);
+    bool hasPermissions = await FlutterBackground.hasPermissions;
+
+    if (!hasPermissions) {
+      Get.back();
+      return backgroundPermissionDenied().show(onRequestPermission: () {
+        requetsBackgroundServices();
+      });
+    } else {
+      print('Background service grandted');
+      Get.back();
+      checkProfile();
+      socketSubscription = ref.onValue.listen(
+        (DatabaseEvent event) {
+          print(event.snapshot.value);
+          updateMainSocket(event);
+        },
+        onError: (Object o) {
+          final error = o as FirebaseException;
+          print(error);
+        },
+      );
+      FlutterBackground.enableBackgroundExecution();
+    }
+  }
+
   @override
   void onInit() {
     super.onInit();
-    checkProfile();
-    socketSubscription = ref.onValue.listen(
-      (DatabaseEvent event) {
-        print(event.snapshot.value);
-        updateMainSocket(event);
-      },
-      onError: (Object o) {
-        final error = o as FirebaseException;
-        print(error);
-      },
-    );
+    requetsBackgroundServices();
   }
 
   @override

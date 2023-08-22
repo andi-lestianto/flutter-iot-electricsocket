@@ -3,6 +3,7 @@ import 'package:flutter/services.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:get/get.dart';
+import 'package:move_to_background/move_to_background.dart';
 import 'package:smartsocket/app/data/mainsocket_model.dart';
 import 'package:smartsocket/app/data/notification_model.dart';
 import 'package:smartsocket/app/helper/controlenum_helper.dart';
@@ -13,7 +14,7 @@ import 'package:smartsocket/app/theme/font_theme.dart';
 import 'package:smartsocket/app/widget/toast_widget.dart';
 
 class ConfigureNotificationDialog {
-  dialogShow(BuildContext context, {required bool isEdit}) {
+  dialogShow(BuildContext context, {int? idAlarm}) {
     showModalBottomSheet(
       isScrollControlled: true,
       backgroundColor: ClrTheme.clrTransparent,
@@ -38,7 +39,7 @@ class ConfigureNotificationDialog {
                   mainAxisSize: MainAxisSize.min,
                   children: [
                     Text(
-                      (isEdit ? 'Edit' : 'Tambah') + ' Data Pengingat',
+                      (idAlarm != null ? 'Edit' : 'Tambah') + ' Data Pengingat',
                       style: FontTheme.bold.copyWith(fontSize: 16.sp),
                     ),
                     SizedBox(
@@ -219,11 +220,20 @@ class ConfigureNotificationDialog {
                               padding: EdgeInsets.symmetric(vertical: 12.w),
                               backgroundColor: ClrTheme.clrGold),
                           onPressed: () {
-                            _.addNotificationAlarm(
-                                timeAlarm: _.selectedTime,
-                                alarmName: _.nameController.text,
-                                controlSocket: _.selectedControlSocket,
-                                controlType: _.selectedControlType);
+                            if (idAlarm != null) {
+                              _.editNotificationAlarm(
+                                  idAlarm: idAlarm,
+                                  timeAlarm: _.selectedTime,
+                                  alarmName: _.nameController.text,
+                                  controlSocket: _.selectedControlSocket,
+                                  controlType: _.selectedControlType);
+                            } else {
+                              _.addNotificationAlarm(
+                                  timeAlarm: _.selectedTime,
+                                  alarmName: _.nameController.text,
+                                  controlSocket: _.selectedControlSocket,
+                                  controlType: _.selectedControlType);
+                            }
                           },
                           child: Text(
                             'Simpan',
@@ -243,21 +253,27 @@ class ConfigureNotificationDialog {
 }
 
 class configureSocketDesc {
-  dialogShow(
+  dialogShow(BuildContext context,
       {required String socketId,
       required Socket socket,
       required TextEditingController textEditingController,
       required Function onSave}) {
-    return Get.dialog(
-      AlertDialog(
-        elevation: 0,
-        backgroundColor: ClrTheme.clrTransparent,
-        content: Container(
+    return showModalBottomSheet(
+      isScrollControlled: true,
+      backgroundColor: ClrTheme.clrTransparent,
+      useRootNavigator: true,
+      context: context,
+      builder: (context) => Padding(
+        padding:
+            EdgeInsets.only(bottom: MediaQuery.viewInsetsOf(context).bottom),
+        child: Container(
           width: 1.sw,
           padding: EdgeInsets.all(24.w),
           decoration: BoxDecoration(
-              borderRadius: BorderRadius.circular(8.r),
-              color: ClrTheme.clrWhite),
+              color: ClrTheme.clrWhite,
+              borderRadius: BorderRadius.only(
+                  topLeft: Radius.circular(16.r),
+                  topRight: Radius.circular(16.r))),
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
@@ -273,7 +289,6 @@ class configureSocketDesc {
                 cursorColor: ClrTheme.clrGold,
                 style: FontTheme.regular.copyWith(fontSize: 12.sp),
                 decoration: InputDecoration(
-                    contentPadding: EdgeInsets.symmetric(horizontal: 12.w),
                     filled: true,
                     fillColor: ClrTheme.clrWhiteGray,
                     border: OutlineInputBorder(
@@ -283,55 +298,24 @@ class configureSocketDesc {
               SizedBox(
                 height: 16.w,
               ),
-              Row(
-                children: [
-                  Expanded(
-                    child: GestureDetector(
-                      onTap: () {
-                        Get.back();
-                      },
-                      child: Container(
-                        padding: EdgeInsets.symmetric(
-                            horizontal: 8.w, vertical: 4.w),
-                        decoration: BoxDecoration(
-                            borderRadius: BorderRadius.circular(4.r),
-                            color: ClrTheme.clrWhiteGray,
-                            border: Border.all(
-                                width: 2, color: ClrTheme.clrWhiteGray)),
-                        child: Center(
-                          child: Text('Kembali',
-                              style:
-                                  FontTheme.regular.copyWith(fontSize: 12.sp)),
-                        ),
-                      ),
-                    ),
-                  ),
-                  SizedBox(
-                    width: 16.w,
-                  ),
-                  Expanded(
-                    child: GestureDetector(
-                      onTap: () {
-                        onSave();
-                      },
-                      child: Container(
-                        padding: EdgeInsets.symmetric(
-                            horizontal: 8.w, vertical: 4.w),
-                        decoration: BoxDecoration(
-                            borderRadius: BorderRadius.circular(4.r),
-                            color: ClrTheme.clrGold,
-                            border:
-                                Border.all(width: 2, color: ClrTheme.clrGold)),
-                        child: Center(
-                          child: Text('Simpan',
-                              style: FontTheme.regular.copyWith(
-                                  fontSize: 12.sp, color: ClrTheme.clrWhite)),
-                        ),
-                      ),
-                    ),
-                  ),
-                ],
-              )
+              SizedBox(
+                width: 1.sw,
+                child: ElevatedButton(
+                    style: ElevatedButton.styleFrom(
+                        elevation: 0,
+                        shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(12.r)),
+                        padding: EdgeInsets.symmetric(vertical: 12.w),
+                        backgroundColor: ClrTheme.clrGold),
+                    onPressed: () {
+                      onSave();
+                    },
+                    child: Text(
+                      'Simpan',
+                      style: FontTheme.bold
+                          .copyWith(fontSize: 16.sp, color: ClrTheme.clrWhite),
+                    )),
+              ),
             ],
           ),
         ),
@@ -560,7 +544,7 @@ class exitConfirmationDialog {
                   Expanded(
                     child: GestureDetector(
                       onTap: () {
-                        SystemNavigator.pop();
+                        MoveToBackground.moveTaskToBack();
                       },
                       child: Container(
                         padding: EdgeInsets.symmetric(
@@ -580,6 +564,90 @@ class exitConfirmationDialog {
                   ),
                 ],
               )
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+class backgroundPermissionDenied {
+  show({required Function onRequestPermission}) {
+    Get.dialog(
+      AlertDialog(
+        elevation: 0,
+        backgroundColor: ClrTheme.clrTransparent,
+        content: Container(
+          width: 1.sw,
+          padding: EdgeInsets.all(24.w),
+          decoration: BoxDecoration(
+              borderRadius: BorderRadius.circular(8.r),
+              color: ClrTheme.clrWhite),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Text(
+                'Perijinan dibutuhkan!',
+                style: FontTheme.bold.copyWith(fontSize: 16.sp),
+              ),
+              SizedBox(
+                height: 8.w,
+              ),
+              Text(
+                'Untuk menggunakan aplikasi ini, diperlukan perijinan untuk menjalankan aplikasi di latar belakang!',
+                style: FontTheme.regular.copyWith(fontSize: 12.sp),
+                textAlign: TextAlign.center,
+              ),
+              SizedBox(
+                height: 16.w,
+              ),
+              Container(
+                width: 1.sw,
+                child: GestureDetector(
+                  onTap: () {
+                    onRequestPermission();
+                  },
+                  child: Container(
+                    padding:
+                        EdgeInsets.symmetric(horizontal: 8.w, vertical: 4.w),
+                    decoration: BoxDecoration(
+                        borderRadius: BorderRadius.circular(4.r),
+                        color: ClrTheme.clrGold,
+                        border: Border.all(width: 2, color: ClrTheme.clrGold)),
+                    child: Center(
+                      child: Text('Request Ulang',
+                          style: FontTheme.regular.copyWith(
+                              fontSize: 12.sp, color: ClrTheme.clrWhite)),
+                    ),
+                  ),
+                ),
+              ),
+              SizedBox(
+                height: 8.w,
+              ),
+              Container(
+                width: 1.sw,
+                child: GestureDetector(
+                  onTap: () {
+                    MoveToBackground.moveTaskToBack();
+                  },
+                  child: Container(
+                    padding:
+                        EdgeInsets.symmetric(horizontal: 8.w, vertical: 4.w),
+                    decoration: BoxDecoration(
+                        borderRadius: BorderRadius.circular(4.r),
+                        color: ClrTheme.clrWhiteGray,
+                        border:
+                            Border.all(width: 2, color: ClrTheme.clrWhiteGray)),
+                    child: Center(
+                      child: Text('Keluar',
+                          style: FontTheme.regular.copyWith(
+                              fontSize: 12.sp, color: ClrTheme.clrBlack)),
+                    ),
+                  ),
+                ),
+              ),
             ],
           ),
         ),

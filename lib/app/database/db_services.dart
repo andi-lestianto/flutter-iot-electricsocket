@@ -1,6 +1,4 @@
 import 'dart:convert';
-
-import 'package:get/get_connect/http/src/utils/utils.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:smartsocket/app/data/notification_model.dart';
 import 'package:smartsocket/app/data/user_model.dart';

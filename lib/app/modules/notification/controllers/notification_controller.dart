@@ -104,26 +104,27 @@ class NotificationController extends GetxController {
             controlSocket,
             controlType,
             AlarmSettings(
-              id: notificationAlarm.isEmpty
-                  ? 1
-                  : notificationAlarm.last.alarmSettings!.id + 1,
-              dateTime: DateTime.parse(
-                  '${DateTimeHelper().getDateNow()} ${timeAlarm}'),
-              assetAudioPath: 'assets/audio/alarmtone.mp3',
-              loopAudio: true,
-              vibrate: true,
-              fadeDuration: 3.0,
-              notificationTitle: alarmName,
-              notificationBody: 'Klik disini untuk menonaktifkan notifikasi',
-              enableNotificationOnKill: true,
-            ));
+                id: notificationAlarm.isEmpty
+                    ? 1
+                    : notificationAlarm.last.alarmSettings!.id + 1,
+                dateTime: DateTime.parse(
+                    '${DateTimeHelper().getDateNow()} ${timeAlarm}'),
+                assetAudioPath: 'assets/audio/alarmtone.mp3',
+                loopAudio: false,
+                vibrate: true,
+                fadeDuration: 3.0,
+                notificationTitle: alarmName,
+                notificationBody: 'Klik disini untuk membuka aplikasi',
+                enableNotificationOnKill: true,
+                volumeMax: false));
         notificationAlarm.add(data);
         dbServices.updateNotificationData(
             listNotificationAlarm: notificationAlarm);
         update();
-        ToastPopup().showSucess(message: 'Pengingat berhasil ditambahkan!');
         print(data.alarmSettings);
         await setAlarm(data: data.alarmSettings!);
+        Get.back();
+        ToastPopup().showSucess(message: 'Pengingat berhasil ditambahkan!');
       }
     } catch (e) {
       print(e);
@@ -143,28 +144,22 @@ class NotificationController extends GetxController {
           controlType == ControlType.none) {
         ToastPopup().showAlert(message: 'Type kontrol tidak boleh \'none\'');
       } else {
-        NotificationAlarm data = NotificationAlarm(
-            controlSocket,
-            controlType,
-            AlarmSettings(
-              id: notificationAlarm.isEmpty
-                  ? 1
-                  : notificationAlarm.last.alarmSettings!.id + 1,
-              dateTime: DateTime.parse(
-                  '${DateTimeHelper().getDateNow()} ${timeAlarm}'),
-              assetAudioPath: 'assets/audio/alarmtone.mp3',
-              loopAudio: true,
-              vibrate: true,
-              fadeDuration: 3.0,
-              notificationTitle: alarmName,
-              notificationBody: 'Klik disini untuk menonaktifkan notifikasi',
-              enableNotificationOnKill: true,
-            ));
-        notificationAlarm.add(data);
-        dbServices.updateNotificationData(
-            listNotificationAlarm: notificationAlarm);
-        update();
-        ToastPopup().showSucess(message: 'Pengingat berhasil ditambahkan!');
+        int index = notificationAlarm
+            .indexWhere((element) => element.alarmSettings!.id == idAlarm);
+
+        if (index != -1) {
+          notificationAlarm[index] = notificationAlarm[index].copyWith(
+              controlSocket: controlSocket,
+              controlType: controlType,
+              alarmSettings: notificationAlarm[index]
+                  .alarmSettings!
+                  .copyWith(notificationTitle: alarmName));
+          dbServices.updateNotificationData(
+              listNotificationAlarm: notificationAlarm);
+          update();
+          Get.back();
+          ToastPopup().showSucess(message: 'Pengingat berhasil diedit!');
+        }
       }
     } catch (e) {
       print(e);
@@ -221,6 +216,9 @@ class NotificationController extends GetxController {
         response = await Alarm.set(alarmSettings: data);
       }
       if (response) {
+        await Alarm.setNotificationOnAppKillContent(
+            'Opss! Anda baru saja menghentikan proses aplikasi',
+            'Penjadwalan stopkontak mungkin tidak berfungsi');
         print('Alarm setted');
       } else {
         print('Alarm failed');
@@ -241,6 +239,7 @@ class NotificationController extends GetxController {
   getDataNotificationFromLocal() async {
     List<NotificationAlarm> data = await dbServices.getAllNotificationData();
     if (data.isNotEmpty) {
+      notificationAlarm.clear();
       notificationAlarm.addAll(data);
     }
 

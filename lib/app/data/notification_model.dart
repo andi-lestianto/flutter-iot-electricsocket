@@ -25,6 +25,14 @@ class NotificationAlarm {
     data['alarmSettings'] = this.alarmSettings!.toJson();
     return data;
   }
+
+  NotificationAlarm copyWith(
+      {ControlSocket? controlSocket,
+      ControlType? controlType,
+      AlarmSettings? alarmSettings}) {
+    return NotificationAlarm(controlSocket ?? this.controlSocket,
+        controlType ?? this.controlType, alarmSettings ?? this.alarmSettings);
+  }
 }
 
 enum ControlSocket {

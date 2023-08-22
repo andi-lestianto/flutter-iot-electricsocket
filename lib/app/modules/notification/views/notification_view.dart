@@ -43,8 +43,7 @@ class NotificationView extends GetView<NotificationController> {
                       splashColor: ClrTheme.clrTransparent,
                       onTap: () {
                         _.clearAlarmForm();
-                        ConfigureNotificationDialog()
-                            .dialogShow(context, isEdit: false);
+                        ConfigureNotificationDialog().dialogShow(context);
                       },
                       child: Padding(
                         padding: EdgeInsets.symmetric(vertical: 9.w),
@@ -85,90 +84,107 @@ class NotificationView extends GetView<NotificationController> {
                         ),
                       )
                     : Expanded(
-                        child: SingleChildScrollView(
-                          physics: BouncingScrollPhysics(),
-                          child: Column(
-                            children: [
-                              ...List.generate(
-                                  _.notificationAlarm.length,
-                                  (index) => Column(
-                                        children: [
-                                          Dismissible(
-                                            key: ValueKey(index),
-                                            direction:
-                                                DismissDirection.endToStart,
-                                            onDismissed: (direction) async {},
-                                            confirmDismiss: (direction) async {
-                                              return await showConfirmDialog(
-                                                  context, onDelete: () {
-                                                _.deleteNotificationAlarm(
-                                                    data: _.notificationAlarm[
-                                                        index]);
-                                              });
-                                            },
-                                            background: Container(
-                                              decoration: BoxDecoration(
-                                                  color: ClrTheme.clrError),
-                                              child: Row(
-                                                mainAxisAlignment:
-                                                    MainAxisAlignment.center,
-                                                children: [
-                                                  SvgPicture.asset(
-                                                    'assets/icon/ic-delete.svg',
-                                                    height: 30.w,
-                                                    width: 30.w,
-                                                    color: ClrTheme.clrWhite,
-                                                  ),
-                                                  SizedBox(
-                                                    width: 8.w,
-                                                  ),
-                                                  Text(
-                                                    'Hapus data',
-                                                    style: FontTheme.regular
-                                                        .copyWith(
-                                                            fontSize: 12.sp,
-                                                            color: ClrTheme
-                                                                .clrWhite),
-                                                  ),
-                                                ],
-                                              ),
-                                            ),
-                                            child: FutureBuilder(
-                                              future: _.getAlarm(
-                                                  id: _.notificationAlarm[index]
-                                                      .alarmSettings!.id),
-                                              builder: (context, snapshot) =>
-                                                  NotificationCardWidget(
-                                                isActive: snapshot.data == null
-                                                    ? false
-                                                    : snapshot.data!,
-                                                data:
-                                                    _.notificationAlarm[index],
-                                                onIconTap: () async {
-                                                  // _.tesDate();
-                                                  await _.setAlarm(
-                                                      data: _
-                                                          .notificationAlarm[
-                                                              index]
-                                                          .alarmSettings!);
-                                                },
-                                                onTap: () {
-                                                  _.fillAlarmForm(
+                        child: RefreshIndicator(
+                          color: ClrTheme.clrGold,
+                          onRefresh: () async {
+                            await Future.delayed(Duration(seconds: 2)).then(
+                                (value) => _.getDataNotificationFromLocal());
+                          },
+                          child: ScrollConfiguration(
+                            behavior: RemoveGlow(),
+                            child: ListView(
+                              children: [
+                                ...List.generate(
+                                    _.notificationAlarm.length,
+                                    (index) => Column(
+                                          children: [
+                                            Dismissible(
+                                              key: ValueKey(index),
+                                              direction:
+                                                  DismissDirection.endToStart,
+                                              onDismissed: (direction) async {},
+                                              confirmDismiss:
+                                                  (direction) async {
+                                                return await showConfirmDialog(
+                                                    context, onDelete: () {
+                                                  _.deleteNotificationAlarm(
                                                       data: _.notificationAlarm[
                                                           index]);
-                                                  ConfigureNotificationDialog()
-                                                      .dialogShow(context,
-                                                          isEdit: true);
-                                                },
+                                                });
+                                              },
+                                              background: Container(
+                                                decoration: BoxDecoration(
+                                                    color: ClrTheme.clrError),
+                                                child: Row(
+                                                  mainAxisAlignment:
+                                                      MainAxisAlignment.center,
+                                                  children: [
+                                                    SvgPicture.asset(
+                                                      'assets/icon/ic-delete.svg',
+                                                      height: 30.w,
+                                                      width: 30.w,
+                                                      color: ClrTheme.clrWhite,
+                                                    ),
+                                                    SizedBox(
+                                                      width: 8.w,
+                                                    ),
+                                                    Text(
+                                                      'Hapus data',
+                                                      style: FontTheme.regular
+                                                          .copyWith(
+                                                              fontSize: 12.sp,
+                                                              color: ClrTheme
+                                                                  .clrWhite),
+                                                    ),
+                                                  ],
+                                                ),
+                                              ),
+                                              child: FutureBuilder(
+                                                future: _.getAlarm(
+                                                    id: _
+                                                        .notificationAlarm[
+                                                            index]
+                                                        .alarmSettings!
+                                                        .id),
+                                                builder: (context, snapshot) =>
+                                                    NotificationCardWidget(
+                                                  isActive:
+                                                      snapshot.data == null
+                                                          ? false
+                                                          : snapshot.data!,
+                                                  data: _
+                                                      .notificationAlarm[index],
+                                                  onIconTap: () async {
+                                                    // _.tesDate();
+                                                    await _.setAlarm(
+                                                        data: _
+                                                            .notificationAlarm[
+                                                                index]
+                                                            .alarmSettings!);
+                                                  },
+                                                  onTap: () {
+                                                    _.fillAlarmForm(
+                                                        data:
+                                                            _.notificationAlarm[
+                                                                index]);
+                                                    ConfigureNotificationDialog()
+                                                        .dialogShow(context,
+                                                            idAlarm: _
+                                                                .notificationAlarm[
+                                                                    index]
+                                                                .alarmSettings!
+                                                                .id);
+                                                  },
+                                                ),
                                               ),
                                             ),
-                                          ),
-                                          SizedBox(
-                                            height: 16.w,
-                                          )
-                                        ],
-                                      ))
-                            ],
+                                            SizedBox(
+                                              height: 16.w,
+                                            )
+                                          ],
+                                        ))
+                              ],
+                            ),
                           ),
                         ),
                       )
@@ -263,5 +279,13 @@ class NotificationView extends GetView<NotificationController> {
         ),
       ),
     );
+  }
+}
+
+class RemoveGlow extends ScrollBehavior {
+  @override
+  Widget buildOverscrollIndicator(
+      BuildContext context, Widget child, ScrollableDetails details) {
+    return child;
   }
 }
