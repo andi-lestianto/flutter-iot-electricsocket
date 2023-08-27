@@ -275,6 +275,7 @@ class configureSocketDesc {
                   topLeft: Radius.circular(16.r),
                   topRight: Radius.circular(16.r))),
           child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
             mainAxisSize: MainAxisSize.min,
             children: [
               Text(
@@ -282,7 +283,7 @@ class configureSocketDesc {
                 style: FontTheme.bold.copyWith(fontSize: 16.sp),
               ),
               SizedBox(
-                height: 8.w,
+                height: 16.w,
               ),
               TextField(
                 controller: textEditingController,
