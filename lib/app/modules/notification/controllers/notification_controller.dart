@@ -151,9 +151,10 @@ class NotificationController extends GetxController {
           notificationAlarm[index] = notificationAlarm[index].copyWith(
               controlSocket: controlSocket,
               controlType: controlType,
-              alarmSettings: notificationAlarm[index]
-                  .alarmSettings!
-                  .copyWith(notificationTitle: alarmName));
+              alarmSettings: notificationAlarm[index].alarmSettings!.copyWith(
+                  notificationTitle: alarmName,
+                  dateTime: DateTime.parse(
+                      '${DateTimeHelper().getDateNow()} ${timeAlarm}')));
           dbServices.updateNotificationData(
               listNotificationAlarm: notificationAlarm);
           update();

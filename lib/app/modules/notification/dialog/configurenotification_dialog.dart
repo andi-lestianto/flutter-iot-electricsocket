@@ -7,8 +7,11 @@ import 'package:move_to_background/move_to_background.dart';
 import 'package:smartsocket/app/data/mainsocket_model.dart';
 import 'package:smartsocket/app/data/notification_model.dart';
 import 'package:smartsocket/app/helper/controlenum_helper.dart';
+import 'package:smartsocket/app/helper/navigation_helper.dart';
 import 'package:smartsocket/app/modules/home/controllers/home_controller.dart';
+import 'package:smartsocket/app/modules/mainwrapper/controllers/mainwrapper_controller.dart';
 import 'package:smartsocket/app/modules/notification/controllers/notification_controller.dart';
+import 'package:smartsocket/app/routes/app_pages.dart';
 import 'package:smartsocket/app/theme/color_theme.dart';
 import 'package:smartsocket/app/theme/font_theme.dart';
 import 'package:smartsocket/app/widget/toast_widget.dart';
@@ -493,79 +496,92 @@ class exitConfirmationDialog {
       AlertDialog(
         elevation: 0,
         backgroundColor: ClrTheme.clrTransparent,
-        content: Container(
-          width: 1.sw,
-          padding: EdgeInsets.all(24.w),
-          decoration: BoxDecoration(
-              borderRadius: BorderRadius.circular(8.r),
-              color: ClrTheme.clrWhite),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Text(
-                'Keluar Aplikasi?',
-                style: FontTheme.bold.copyWith(fontSize: 16.sp),
-              ),
-              SizedBox(
-                height: 8.w,
-              ),
-              Text(
-                'Yakin Ingin Keluar Aplikasi?',
-                style: FontTheme.regular.copyWith(fontSize: 12.sp),
-              ),
-              SizedBox(
-                height: 16.w,
-              ),
-              Row(
-                children: [
-                  Expanded(
-                    child: GestureDetector(
-                      onTap: () {
-                        Get.back();
-                      },
-                      child: Container(
-                        padding: EdgeInsets.symmetric(
-                            horizontal: 8.w, vertical: 4.w),
-                        decoration: BoxDecoration(
-                            borderRadius: BorderRadius.circular(4.r),
-                            color: ClrTheme.clrWhiteGray,
-                            border: Border.all(
-                                width: 2, color: ClrTheme.clrWhiteGray)),
-                        child: Center(
-                          child: Text('Tidak',
-                              style:
-                                  FontTheme.regular.copyWith(fontSize: 12.sp)),
+        content: GetBuilder<MainwrapperController>(
+          builder: (_) => Container(
+            width: 1.sw,
+            padding: EdgeInsets.all(24.w),
+            decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(8.r),
+                color: ClrTheme.clrWhite),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Text(
+                  'Keluar Aplikasi?',
+                  style: FontTheme.bold.copyWith(fontSize: 16.sp),
+                ),
+                SizedBox(
+                  height: 8.w,
+                ),
+                Text(
+                  'Yakin Ingin Keluar Aplikasi?',
+                  style: FontTheme.regular.copyWith(fontSize: 12.sp),
+                ),
+                SizedBox(
+                  height: 16.w,
+                ),
+                Row(
+                  children: [
+                    Expanded(
+                      child: GestureDetector(
+                        onTap: () {
+                          Get.back();
+                        },
+                        child: Container(
+                          padding: EdgeInsets.symmetric(
+                              horizontal: 8.w, vertical: 4.w),
+                          decoration: BoxDecoration(
+                              borderRadius: BorderRadius.circular(4.r),
+                              color: ClrTheme.clrWhiteGray,
+                              border: Border.all(
+                                  width: 2, color: ClrTheme.clrWhiteGray)),
+                          child: Center(
+                            child: Text('Tidak',
+                                style: FontTheme.regular
+                                    .copyWith(fontSize: 12.sp)),
+                          ),
                         ),
                       ),
                     ),
-                  ),
-                  SizedBox(
-                    width: 16.w,
-                  ),
-                  Expanded(
-                    child: GestureDetector(
-                      onTap: () {
-                        MoveToBackground.moveTaskToBack();
-                      },
-                      child: Container(
-                        padding: EdgeInsets.symmetric(
-                            horizontal: 8.w, vertical: 4.w),
-                        decoration: BoxDecoration(
-                            borderRadius: BorderRadius.circular(4.r),
-                            color: ClrTheme.clrGold,
-                            border:
-                                Border.all(width: 2, color: ClrTheme.clrGold)),
-                        child: Center(
-                          child: Text('Ya',
-                              style: FontTheme.regular.copyWith(
-                                  fontSize: 12.sp, color: ClrTheme.clrWhite)),
+                    SizedBox(
+                      width: 16.w,
+                    ),
+                    Expanded(
+                      child: GestureDetector(
+                        onTap: () async {
+                          Get.back();
+
+                          if (_.currentRoutes != Routes.HOME) {
+                            await Future.delayed(Duration(milliseconds: 100))
+                                .then((value) {
+                              NavHelper.mainNav.currentState!
+                                  .pushReplacementNamed(Routes.HOME);
+                            });
+                          }
+                          await Future.delayed(Duration(milliseconds: 100))
+                              .then(
+                                  (value) => MoveToBackground.moveTaskToBack());
+                        },
+                        child: Container(
+                          padding: EdgeInsets.symmetric(
+                              horizontal: 8.w, vertical: 4.w),
+                          decoration: BoxDecoration(
+                              borderRadius: BorderRadius.circular(4.r),
+                              color: ClrTheme.clrGold,
+                              border: Border.all(
+                                  width: 2, color: ClrTheme.clrGold)),
+                          child: Center(
+                            child: Text('Ya',
+                                style: FontTheme.regular.copyWith(
+                                    fontSize: 12.sp, color: ClrTheme.clrWhite)),
+                          ),
                         ),
                       ),
                     ),
-                  ),
-                ],
-              )
-            ],
+                  ],
+                )
+              ],
+            ),
           ),
         ),
       ),

@@ -18,7 +18,12 @@ class MainwrapperView extends GetView<MainwrapperController> {
     return GetBuilder<MainwrapperController>(
       builder: (_) => WillPopScope(
         onWillPop: () async {
-          MoveToBackground.moveTaskToBack();
+          if (_.currentRoutes != Routes.HOME) {
+            NavHelper.mainNav.currentState!.pushReplacementNamed(Routes.HOME);
+          }
+          await Future.delayed(Duration(milliseconds: 100))
+              .then((value) => MoveToBackground.moveTaskToBack());
+
           return false;
         },
         child: Scaffold(
