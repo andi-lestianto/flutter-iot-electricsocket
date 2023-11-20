@@ -13,7 +13,6 @@ class MainwrapperController extends GetxController {
     await Future.delayed(Duration.zero).then((value) => update());
   }
 
-  final count = 0.obs;
   @override
   void onInit() {
     super.onInit();
@@ -26,5 +25,4 @@ class MainwrapperController extends GetxController {
 
   @override
   void onClose() {}
-  void increment() => count.value++;
 }
