@@ -27,7 +27,6 @@ class HomeController extends GetxController {
   }
 
   UserModel? userModel;
-
   XFile? pickedFoto;
   final ImagePicker picker = ImagePicker();
 
