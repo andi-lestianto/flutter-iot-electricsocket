@@ -18,7 +18,6 @@ class HomeController extends GetxController {
   final DBServices dbServices = DBServices();
   DatabaseReference ref = FirebaseDatabase.instance.ref('data');
   MainSocket? mainSocket;
-
   final TextEditingController labelController = TextEditingController();
   final TextEditingController nameController = TextEditingController();
 
