@@ -41,7 +41,6 @@ class HomeController extends GetxController {
     } catch (e) {
       print(e);
     }
-
     update();
   }
 
