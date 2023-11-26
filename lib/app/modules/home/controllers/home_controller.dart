@@ -155,7 +155,6 @@ class HomeController extends GetxController {
         requetsBackgroundServices();
       });
     } else {
-      print('Background service grandted');
       Get.back();
       checkProfile();
       socketSubscription = ref.onValue.listen(
