@@ -1,11 +1,9 @@
-// import 'package:alarm/alarm.dart';
 import 'package:alarm/alarm.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_native_splash/flutter_native_splash.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-
 import 'package:get/get.dart';
 import 'package:intl/date_symbol_data_local.dart';
 import 'package:smartsocket/app/data/notification_model.dart';
